@@ -85,33 +85,30 @@ export const UserForm: React.FC<UserFormProps> = ({ profiles, initialData, onSub
  return (
 	<form onSubmit={handleSubmit} className="space-y-4">
 	 <div className="space-y-2">
-		<Label htmlFor="firstName" className="text-[#343A40]">First Name *</Label>
+		<Label htmlFor="firstName">First Name *</Label>
 		<Input 
 						id="firstName" type="text" name="firstName" 
-						value={formData.firstName} onChange={handleChange} required 
-						className="focus-visible:ring-[#1B4F72] focus-visible:ring-offset-0 border-[#6C757D]"
+						value={formData.firstName} onChange={handleChange} required
 				/>
 	 </div>
 	 <div className="space-y-2">
-		<Label htmlFor="lastName" className="text-[#343A40]">Last Name *</Label>
+		<Label htmlFor="lastName">Last Name *</Label>
 		<Input 
 						id="lastName" type="text" name="lastName" 
-						value={formData.lastName} onChange={handleChange} required 
-						className="focus-visible:ring-[#1B4F72] focus-visible:ring-offset-0 border-[#6C757D]"
+						value={formData.lastName} onChange={handleChange} required
 				/>
 	 </div>
 	 <div className="space-y-2">
-		<Label htmlFor="email" className="text-[#343A40]">Email *</Label>
+		<Label htmlFor="email">Email *</Label>
 		<Input 
 						id="email" type="email" name="email" 
-						value={formData.email} onChange={handleChange} required 
-						className="focus-visible:ring-[#1B4F72] focus-visible:ring-offset-0 border-[#6C757D]"
+						value={formData.email} onChange={handleChange} required
 				/>
 	 </div>
 	 <div className="space-y-2">
-		<Label htmlFor="profileId" className="text-[#343A40]">Profile *</Label>
+		<Label htmlFor="profileId">Profile *</Label>
 		<Select name="profileId" value={formData.profileId} onValueChange={handleSelectChange} required>
-						<SelectTrigger id="profileId" className="focus:ring-[#1B4F72] focus:ring-offset-0 border-[#6C757D]">
+						<SelectTrigger id="profileId">
 								<SelectValue placeholder="Select a profile" />
 						</SelectTrigger>
 						<SelectContent>
@@ -127,17 +124,15 @@ export const UserForm: React.FC<UserFormProps> = ({ profiles, initialData, onSub
 				<Checkbox 
 						id="isActive" 
 						checked={formData.isActive} 
-						onCheckedChange={handleCheckboxChange} 
-						className="border-[#1B4F72] data-[state=checked]:bg-[#1B4F72] data-[state=checked]:text-[#F8F9FA] focus-visible:ring-[#1B4F72]"
+						onCheckedChange={handleCheckboxChange}
 				/>
-				<Label htmlFor="isActive" className="text-sm font-medium leading-none text-[#343A40]">User is active</Label>
+				<Label htmlFor="isActive" className="text-sm font-medium leading-none ">User is active</Label>
 			</div>
 
 	 <div className="flex justify-start pt-4">
 		<Button
 		 type="submit"
 		 disabled={isLoading}
-		 className="bg-[#F2A100] text-[#0A2342] hover:bg-[#F2A100]/90 font-semibold"
 		>
 		 {isLoading ? 'Saving...' : isEditing ? 'Update User' : 'Create User'}
 		</Button>

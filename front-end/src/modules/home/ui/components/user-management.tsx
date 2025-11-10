@@ -1,16 +1,18 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
-
-import { api } from '@/services/api.service';
-import { User, Profile, UserWithProfile, UserFormData } from '@/types';
-import { UserFilters } from './user-filters';
-import { UserTable } from './user-table';
-import { UserForm } from './user-form';
-
-// UI Components
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { toast } from 'sonner';
+import { useState, useEffect, useCallback } from "react";
+import { api } from "@/services/api.service";
+import { User, Profile, UserWithProfile, UserFormData } from "@/types";
+import { UserFilters } from "./user-filters";
+import { UserTable } from "./user-table";
+import { UserForm } from "./user-form";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 export default function UserManagement() {
 	const [users, setUsers] = useState<User[]>([]);
@@ -19,25 +21,24 @@ export default function UserManagement() {
 	const [submitting, setSubmitting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	const [selectedProfile, setSelectedProfile] = useState<string>('all');
-	const [searchId, setSearchId] = useState('');
+	const [selectedProfile, setSelectedProfile] = useState<string>("all");
+	const [searchId, setSearchId] = useState("");
 
-	// Dialog states
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [editingUser, setEditingUser] = useState<User | null>(null);
 
 	const loadData = useCallback(async () => {
+		setLoading(true);
 		try {
-			setLoading(true);
 			const [usersData, profilesData] = await Promise.all([
-				api.users.getAll(selectedProfile === 'all' ? undefined : selectedProfile),
+				api.users.getAll(selectedProfile === "all" ? undefined : selectedProfile),
 				api.profiles.getAll(),
 			]);
 			setUsers(usersData);
 			setProfiles(profilesData);
 			setError(null);
 		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Failed to load data');
+			setError(err instanceof Error ? err.message : "Failed to load data");
 		} finally {
 			setLoading(false);
 		}
@@ -47,20 +48,22 @@ export default function UserManagement() {
 		loadData();
 	}, [loadData]);
 
-	const getUsersWithProfiles = useCallback((): UserWithProfile[] => {
-		return users.map(user => ({
-			...user,
-			profile: profiles.find(p => p.id === user.profileId),
-		}));
-	}, [users, profiles]);
+	const getUsersWithProfiles = useCallback(
+		(): UserWithProfile[] =>
+			users.map((user) => ({
+				...user,
+				profile: profiles.find((p) => p.id === user.profileId),
+			})),
+		[users, profiles]
+	);
 
-	const getFilteredUsers = useCallback((): UserWithProfile[] => {
+	const getFilteredUsers = useCallback(() => {
 		let filtered = getUsersWithProfiles();
-
 		if (searchId) {
-			filtered = filtered.filter(u => u.id.toLowerCase().includes(searchId.toLowerCase()));
+			filtered = filtered.filter((u) =>
+				u.id.toLowerCase().includes(searchId.toLowerCase())
+			);
 		}
-
 		return filtered;
 	}, [getUsersWithProfiles, searchId]);
 
@@ -75,9 +78,7 @@ export default function UserManagement() {
 	};
 
 	const handleDialogClose = (open: boolean) => {
-		if (!open) {
-			setEditingUser(null);
-		}
+		if (!open) setEditingUser(null);
 		setIsDialogOpen(open);
 	};
 
@@ -92,19 +93,19 @@ export default function UserManagement() {
 			await loadData();
 			handleDialogClose(false);
 		} catch (err) {
-			toast.error(err instanceof Error ? err.message : 'Failed to submit user data');
+			toast.error(err instanceof Error ? err.message : "Failed to submit user data");
 		} finally {
 			setSubmitting(false);
 		}
 	};
 
 	const handleDelete = async (id: string) => {
-		if (!confirm('Are you sure you want to delete this user?')) return;
+		if (!confirm("Are you sure you want to delete this user?")) return;
 		try {
 			await api.users.delete(id);
 			await loadData();
 		} catch (err) {
-			toast.error(err instanceof Error ? err.message : 'Failed to delete user');
+			toast.error(err instanceof Error ? err.message : "Failed to delete user");
 		}
 	};
 
@@ -113,7 +114,7 @@ export default function UserManagement() {
 			await api.users.toggleStatus(id);
 			await loadData();
 		} catch (err) {
-			toast.error(err instanceof Error ? err.message : 'Failed to toggle user status');
+			toast.error(err instanceof Error ? err.message : "Failed to toggle user status");
 		}
 	};
 
@@ -128,11 +129,8 @@ export default function UserManagement() {
 	return (
 		<div className="min-h-screen py-8 px-4">
 			<div className="max-w-7xl mx-auto">
-
 				{error && (
-					<div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6">
-						{error}
-					</div>
+					<div className="mb-4 p-4 bg-red-100 text-red-800 rounded">{error}</div>
 				)}
 
 				<UserFilters
@@ -154,8 +152,8 @@ export default function UserManagement() {
 				<Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
 					<DialogContent className="sm:max-w-[425px]">
 						<DialogHeader>
-							<DialogTitle className="text-[#0A2342] font-bold">
-								{editingUser ? 'Edit User' : 'Create New User'}
+							<DialogTitle>
+								{editingUser ? "Edit User" : "Create New User"}
 							</DialogTitle>
 						</DialogHeader>
 						<UserForm
