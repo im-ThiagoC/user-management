@@ -109,7 +109,7 @@ export default function UserManagement() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center">
         <div className="w-full max-w-7xl">
           <div className="mb-4">
             <Skeleton className="h-10 w-1/3 mb-4" />
