@@ -22,14 +22,9 @@ export class ProfilesController {
 	}
 
 	@Get(':id')
+	@HttpCode(HttpStatus.OK)
 	findOne(@Param('id') id: string) {
-		if(!id) { return { error: 'Profile ID is required' }; }
-		
-		const profile = this.profilesService.findOne(id);
-		if(!profile) {
-			return { error: 'Profile not found' };
-		}
-		return profile;
+		return this.profilesService.findOne(id);
 	}
 
 	@Post()
@@ -39,6 +34,7 @@ export class ProfilesController {
 	}
 
 	@Put(':id')
+	@HttpCode(HttpStatus.OK)
 	update(@Param('id') id: string, @Body() updateProfileDto: UpdateProfileDto) {
 		return this.profilesService.update(id, updateProfileDto);
 	}

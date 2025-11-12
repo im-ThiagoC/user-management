@@ -99,12 +99,24 @@ export const UserTable: React.FC<UserTableProps> = ({
 			<Table>
 				<TableHeader>
 					<TableRow>
-						<TableHead>ID</TableHead>
-						<TableHead>Name</TableHead>
-						<TableHead>Email</TableHead>
-						<TableHead>Profile</TableHead>
-						<TableHead>Status</TableHead>
-						<TableHead>Actions</TableHead>
+						<TableHead>
+							ID
+						</TableHead>
+						<TableHead>
+							Name
+						</TableHead>
+						<TableHead>
+							Email
+						</TableHead>
+						<TableHead>
+							Profile
+						</TableHead>
+						<TableHead className="w-[110px]">
+							Status
+						</TableHead>
+						<TableHead>
+							Actions
+						</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>

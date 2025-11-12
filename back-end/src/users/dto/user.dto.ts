@@ -5,49 +5,35 @@ import {
 	IsString,
 	MinLength,
 } from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserDto {
-	@IsString()
-	@IsNotEmpty()
-	@MinLength(2)
-	firstName: string;
+  @ApiProperty({ example: 'Thiago', description: 'First name', minLength: 2 })
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(2)
+  firstName: string;
 
-	@IsString()
-	@IsNotEmpty()
-	@MinLength(2)
-	lastName: string;
+  @ApiProperty({ example: 'Carvalho', description: 'Last name', minLength: 2 })
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(2)
+  lastName: string;
 
-	@IsEmail()
-	@IsNotEmpty()
-	email: string;
+  @ApiProperty({ example: 'test.carvalho@example.com', description: 'Email address' })
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
 
-	@IsBoolean()
-	isActive: boolean;
+  @ApiProperty({ example: true, description: 'User active status' })
+  @IsBoolean()
+  isActive: boolean;
 
-	@IsString()
-	@IsNotEmpty()
-	profileId: string;
+  @ApiProperty({ example: '1', description: 'Profile ID reference' })
+  @IsString()
+  @IsNotEmpty()
+  profileId: string;
 }
 
-export class UpdateUserDto {
-	@IsString()
-	@IsNotEmpty()
-	@MinLength(2)
-	firstName: string;
-
-	@IsString()
-	@IsNotEmpty()
-	@MinLength(2)
-	lastName: string;
-
-	@IsEmail()
-	@IsNotEmpty()
-	email: string;
-
-	@IsBoolean()
-	isActive: boolean;
-
-	@IsString()
-	@IsNotEmpty()
-	profileId: string;
-}
+export class UpdateUserDto extends PartialType(CreateUserDto) {}

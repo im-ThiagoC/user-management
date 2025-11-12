@@ -43,7 +43,7 @@ export const UserFilters: React.FC<UserFiltersProps> = ({
 						</SelectTrigger>
 						<SelectContent>
 							<SelectItem value="all">All Profiles</SelectItem>
-							{profiles.map(profile => (
+							{profiles && profiles.map(profile => (
 								<SelectItem key={profile.id} value={profile.id}>{profile.name}</SelectItem>
 							))}
 						</SelectContent>

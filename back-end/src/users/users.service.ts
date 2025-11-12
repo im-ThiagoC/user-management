@@ -1,31 +1,18 @@
-import {
-	Injectable,
-	NotFoundException,
-	BadRequestException,
-	ConflictException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import { ProfilesService } from '../profiles/profiles.service';
-import { randomInt, randomUUID } from 'crypto';
+import { randomUUID } from 'crypto';
+import { USERS_MOCK } from './users.mock';
 
 @Injectable()
 export class UsersService {
-	private users: User[] = [
-		new User(randomUUID(), 'John'			, 'Doe'			, 'john.doe@example.com'			, randomInt(0, 2) == 1, randomInt(1,4).toString()),
-		new User(randomUUID(), 'Jane'			, 'Smith'		, 'jane.smith@example.com'		, randomInt(0, 2) == 1, randomInt(1,4).toString()),
-		new User(randomUUID(), 'Bob'			, 'Johnson'	, 'bob.johnson@example.com'		, randomInt(0, 2) == 1, randomInt(1,4).toString()),
-		new User(randomUUID(), 'Alice'		, 'Williams', 'alice.williams@example.com', randomInt(0, 2) == 1, randomInt(1,4).toString()),
-		new User(randomUUID(), 'Charlie'	, 'Brown'		, 'charlie.brown@example.com'	, randomInt(0, 2) == 1, randomInt(1,4).toString()),
-	];
+	private users: User[] = USERS_MOCK;
 
 	constructor(private readonly profilesService: ProfilesService) {}
 
 	findAll(): User[] {
-		const usersCopy = [...this.users];
-
-
-		return usersCopy;
+		return [...this.users];
 	}
 
 	findOne(id: string): User {
@@ -83,21 +70,29 @@ export class UsersService {
 			throw new NotFoundException(`User with ID ${id} not found`);
 		}
 
-		// Validate that profile exists
-		const profile = this.profilesService.findOne(updateUserDto.profileId);
-		if (!profile) {
-			throw new NotFoundException(`Profile with ID ${updateUserDto.profileId} not found`);
+		if(updateUserDto.profileId) {
+			// Validate that profile exists
+			const profile = this.profilesService.findOne(updateUserDto.profileId);
+			if (!profile) {
+				throw new NotFoundException(`Profile with ID ${updateUserDto.profileId} not found`);
+			}
 		}
 
-		// Check if email conflicts with existing user
-		const existingUser = this.users.find(
-			(u) => u.id !== id && u.email.toLowerCase() === updateUserDto.email.toLowerCase(),
-		);
-		
-		if (existingUser) {
-			throw new ConflictException(`User with email "${updateUserDto.email}" already exists`);
+		if(updateUserDto.email) {
+			// Check if email conflicts with existing user
+			const existingUser = this.users.find(
+				(u) =>
+					updateUserDto.email !== undefined &&
+					u.email.toLowerCase() === updateUserDto.email.toLowerCase() &&
+					u.id !== id,
+			);
+			
+			if (existingUser) {
+				throw new ConflictException(`User with email "${updateUserDto.email}" already exists`);
+			}
 		}
 
+		// Update the user
 		this.users[userIndex] = {
 			...this.users[userIndex],
 			...updateUserDto,

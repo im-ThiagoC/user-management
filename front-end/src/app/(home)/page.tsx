@@ -1,5 +1,4 @@
-import UserManagement from "@/modules/home/ui/components/user-management";
-import Image from "next/image";
+import UserManagement from "@/components/user-management";
 import { Suspense } from "react";
 
 export default function Home() {

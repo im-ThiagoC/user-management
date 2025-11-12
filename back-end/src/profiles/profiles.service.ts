@@ -6,14 +6,11 @@ import {
 import { Profile } from './entities/profile.entity';
 import { CreateProfileDto, UpdateProfileDto } from './dto/profile.dto';
 import { randomUUID } from 'crypto';
+import { PROFILES_MOCK } from './profiles.mock';
 
 @Injectable()
 export class ProfilesService {
-	private profiles: Profile[] = [
-		new Profile('1', 'Admin'),
-		new Profile('2', 'Developer'),
-		new Profile('3', 'User'),
-	];
+	private profiles: Profile[] = PROFILES_MOCK;
 
 	findAll(): Profile[] {
 		return this.profiles;
@@ -54,15 +51,20 @@ export class ProfilesService {
 		}
 
 		// Check if new name conflicts with existing profile
-		const existingProfile = this.profiles.find(
-			(p) => p.id !== id && p.name.toLowerCase() === updateProfileDto.name.toLowerCase(),
-		);
+		let existingProfile: Profile | undefined;
+		if (updateProfileDto.name) {
+			existingProfile = this.profiles.find(
+				(p) => p.id !== id && p.name.toLowerCase() === updateProfileDto.name!.toLowerCase(),
+			);
+		}
 		
 		if (existingProfile) {
 			throw new ConflictException(`Profile with name "${updateProfileDto.name}" already exists`);
 		}
 
-		this.profiles[profileIndex].name = updateProfileDto.name;
+		if (updateProfileDto.name !== undefined) {
+			this.profiles[profileIndex].name = updateProfileDto.name;
+		}
 		return this.profiles[profileIndex];
 	}
 

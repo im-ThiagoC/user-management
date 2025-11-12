@@ -3,6 +3,7 @@ import { ProfilesController } from './profiles.controller';
 import { ProfilesService } from './profiles.service';
 import { CreateProfileDto, UpdateProfileDto } from './dto/profile.dto';
 import { validate } from 'class-validator';
+import { NotFoundException } from '@nestjs/common';
 
 const mockProfile = {
   id: '1',
@@ -16,7 +17,6 @@ const mockProfilesService = {
 
 describe('ProfilesController', () => {
   let controller: ProfilesController;
-  let service: ProfilesService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -30,8 +30,6 @@ describe('ProfilesController', () => {
     }).compile();
 
     controller = module.get<ProfilesController>(ProfilesController);
-    service = module.get<ProfilesService>(ProfilesService);
-
     jest.clearAllMocks();
   });
 
@@ -83,12 +81,18 @@ describe('ProfilesController', () => {
       expect(mockProfilesService.findOne).toHaveBeenCalledWith('1');
     });
 
-    it('should return error when profile not found', () => {
-      mockProfilesService.findOne.mockReturnValue(undefined);
+    it('should throw NotFoundException when profile not found', () => {
+      // Configure the mock to throw NotFoundException
+      mockProfilesService.findOne.mockImplementation(() => {
+        throw new NotFoundException(`Profile with ID 999 not found`);
+      });
 
-      const result = controller.findOne('999');
+      // Verify that the service method was called with the correct parameter
+      expect(() => controller.findOne('999')).toThrow(NotFoundException);
+      expect(() => controller.findOne('999')).toThrow('Profile with ID 999 not found');
 
-      expect(result).toEqual({ error: 'Profile not found' });
+      // Verify that the service method was called with the correct parameter
+      expect(mockProfilesService.findOne).toHaveBeenCalledWith('999');
     });
   });
 });
