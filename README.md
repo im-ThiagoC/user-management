@@ -73,6 +73,7 @@ user-management/
 ```bash
 cd back-end
 npm install
+cp .env.example .env
 npm run start:dev
 ```
 
@@ -84,6 +85,7 @@ Documentação Swagger: `http://localhost:3001/api-docs`
 ```bash
 cd front-end
 npm install
+cp .env.example .env.local
 npm run dev
 ```
 
