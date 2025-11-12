@@ -8,6 +8,7 @@ Aplicação fullstack para gerenciamento de usuários e perfis, desenvolvida com
 
 - **NestJS** - Framework Node.js progressivo
 - **TypeScript** - Tipagem estática
+- **Swagger/OpenAPI** - Documentação automática da API
 - **class-validator** - Validação de dados
 - **class-transformer** - Transformação de objetos
 
@@ -15,28 +16,48 @@ Aplicação fullstack para gerenciamento de usuários e perfis, desenvolvida com
 
 - **Next.js 16** (App Router) - Framework React
 - **TypeScript** - Tipagem estática
-- **Tailwind CSS** - Estilização
-- **Shadcn/ui** - Componentes de UI
+- **Tailwind CSS v4** - Estilização moderna
+- **Shadcn/ui** - Componentes de UI acessíveis
+- **React Hook Form** - Gerenciamento de formulários
+- **Zod** - Validação de schemas
+- **TanStack Query** - Gerenciamento de estado servidor
+- **Sonner** - Toast notifications
+- **next-themes** - Suporte a dark mode
 
 ## 📁 Estrutura do Projeto
 
-```r
-project-root/
-├── backend/                 # API NestJS
+```py
+user-management/
+├── back-end/                  # API NestJS
+│   ├── common/
+│   │   ├── filters/           # Exception filters globais
+│   │   └── interceptors/      # Response interceptors
 │   ├── src/
-│   │   ├── profiles/       # Módulo de perfis
-│   │   ├── users/          # Módulo de usuários
-│   │   └── main.ts         # Entry point
+│   │   ├── profiles/          # Módulo de perfis
+│   │   │   ├── dto/           # Data Transfer Objects
+│   │   │   ├── entities/      # Entidades de domínio
+│   │   │   └── *.ts           # Controller, Service, Tests
+│   │   ├── users/             # Módulo de usuários
+│   │   │   ├── dto/           # Data Transfer Objects
+│   │   │   ├── entities/      # Entidades de domínio
+│   │   │   └── *.ts           # Controller, Service, Tests, Mocks
+│   │   ├── app.module.ts      # Módulo raiz
+│   │   └── main.ts            # Entry point
+│   ├── test/                  # Testes E2E
 │   └── package.json
 │
-└── frontend/               # Aplicação Next.js
+└── front-end/                 # Aplicação Next.js
     ├── src/
-    │   ├── app/           # App Router
-    │   ├── components/    # Componentes React (ShadcnUI)
-    │   ├── hooks/         # Hooks
-    │   ├── modules/       # My modules
-    │   ├── types/         # Types
-    │   └── services/      # Serviços de API
+    │   ├── app/               # App Router (rotas)
+    │   ├── components/        # Componentes React
+    │   │   ├── hooks/         # Custom hooks (useUsers, useProfiles)
+    │   │   ├── providers/     # Context providers
+    │   │   ├── ui/            # Componentes Shadcn/ui
+    │   │   └── *.tsx          # Componentes de features
+    │   ├── lib/               # Utilitários
+    │   ├── schemas/           # Schemas Zod para validação
+    │   ├── services/          # API service layer
+    │   └── types/             # TypeScript types
     └── package.json
 ```
 
@@ -50,22 +71,75 @@ project-root/
 ### Backend (Porta 3001)
 
 ```bash
-cd backend
+cd back-end
 npm install
 npm run start:dev
 ```
 
-A API estará disponível em: `http://localhost:3001`
+A API estará disponível em: `http://localhost:3001`  
+Documentação Swagger: `http://localhost:3001/api-docs`
 
 ### Frontend (Porta 3000)
 
 ```bash
-cd frontend
+cd front-end
 npm install
 npm run dev
 ```
 
 A aplicação estará disponível em: `http://localhost:3000`
+
+## 🧪 Scripts Disponíveis
+
+### Scripts do Backend
+
+```bash
+npm run start:dev    # Modo desenvolvimento com watch
+npm run build        # Build para produção
+npm run start:prod   # Executar build de produção
+npm run test         # Executar testes unitários
+npm run test:cov     # Testes com cobertura
+npm run test:e2e     # Testes end-to-end
+npm run lint         # Verificar código (ESLint)
+npm run format       # Formatar código (Prettier)
+```
+
+### Scripts do Frontend
+
+```bash
+npm run dev          # Modo desenvolvimento
+npm run build        # Build para produção
+npm run start        # Executar build de produção
+npm run lint         # Verificar código (ESLint)
+```
+
+## 📚 Documentação da API
+
+A API possui documentação interativa Swagger disponível em:  
+**`http://localhost:3001/api-docs`**
+
+### Formato de Resposta Padronizado
+
+Todas as respostas da API seguem o formato:
+
+```typescript
+{
+  "success": boolean,
+  "data": T,  // Dados retornados
+  "timestamp": string  // ISO 8601
+}
+```
+
+Em caso de erro:
+
+```typescript
+{
+  "success": false,
+  "statusCode": number,
+  "message": string,
+  "timestamp": string
+}
+```
 
 ## 📋 Funcionalidades Implementadas
 
@@ -107,9 +181,8 @@ A aplicação estará disponível em: `http://localhost:3000`
 
 #### Gerenciamento de Perfis
 
-- Tela separada para gerenciar perfis
-- CRUD completo de perfis
-- Validação de exclusão (não permite excluir perfil com usuários)
+- Visualização de perfis no filtro
+- Integração com sistema de usuários (relacionamento)
 
 ## 🎯 Decisões Técnicas
 
@@ -131,15 +204,28 @@ A aplicação estará disponível em: `http://localhost:3000`
    - Comentários apenas onde necessário
 
 2. **Validação de Dados**:
-   - Backend: `class-validator` para validar DTOs
-   - Frontend: Validação antes de submeter ao backend
+   - Backend: `class-validator` para validar DTOs automaticamente
+   - Frontend: Zod schemas + React Hook Form para validação client-side
+   - Feedback instantâneo ao usuário
 
 3. **Tratamento de Erros**:
-   - Status codes HTTP apropriados (200, 201, 400, 404, 409)
+   - Status codes HTTP apropriados (200, 201, 204, 400, 404, 409)
+   - Exception filters globais (`HttpExceptionFilter`)
+   - Response interceptors (`TransformInterceptor`) para padronizar respostas
    - Mensagens de erro descritivas
-   - Feedback visual no frontend
+   - Feedback visual no frontend com toast notifications (Sonner)
 
 4. **TypeScript Strict Mode**: Garantindo máxima segurança de tipos.
+
+5. **Gerenciamento de Estado**:
+   - TanStack Query (React Query) para cache e sincronização de dados do servidor
+   - Invalidação automática de cache após mutations
+   - Loading e error states gerenciados automaticamente
+
+6. **Documentação Automática**:
+   - Swagger/OpenAPI integrado no backend
+   - Decorators `@ApiTags`, `@ApiOperation`, `@ApiParam`, `@ApiBody`, `@ApiResponse`
+   - Interface interativa em `/api-docs`
 
 ### Dados Mockados
 
@@ -150,18 +236,26 @@ Os dados iniciais incluem:
 
 ## 🔄 Fluxo de Dados
 
-```r
+```text
 Frontend (Next.js)
+    ↓ User Action
+React Hook Form + Zod Validation
+    ↓ Valid Data
+TanStack Query (Mutation/Query)
     ↓ HTTP Request
-API Service Layer
-    ↓ fetch
+API Service Layer (fetch)
+    ↓ REST API Call
 Backend (NestJS)
-    ↓ Controller
-Service Layer
-    ↓ Business Logic
+    ↓ Controller (@ApiOperation)
+ValidationPipe (class-validator)
+    ↓ Valid DTO
+Service Layer (Business Logic)
+    ↓ Data Manipulation
 In-Memory Repository
-    ↓ Response
-Frontend (UI Update)
+    ↓ Response Data
+TransformInterceptor (format response)
+    ↓ { success, data, timestamp }
+Frontend (Cache Update + UI Refresh)
 ```
 
 ## ⚠️ Limitações Conhecidas
@@ -176,20 +270,18 @@ Frontend (UI Update)
 ### Curto Prazo
 
 1. **Testes**:
-   - Testes unitários (Jest)
-   - Testes de integração (Supertest)
-   - Testes E2E no frontend (Cypress/Playwright)
+   - ✅ Testes unitários implementados (Jest) para services e controllers
+   - ✅ Testes de validação de DTOs
+   - ⏳ Expandir cobertura de testes para ProfilesService
+   - ⏳ Testes E2E completos (Supertest)
+   - ⏳ Testes no frontend (Vitest/Testing Library)
 
-2. **Validação Avançada**:
-   - Validação de email único
-   - Regras de senha forte
-   - Validação de CPF/CNPJ
-
-3. **UX Melhorada**:
-   - Loading states
-   - Skeleton loaders
-   - Animações de transição
-   - Toast notifications mais sofisticadas
+2. **UX Melhorada**:
+   - ✅ Loading states com Skeleton loaders
+   - ✅ Toast notifications (Sonner)
+   - ✅ Dark mode (next-themes)
+   - ⏳ Animações de transição
+   - ⏳ Confirmação antes de deletar
 
 ### Médio Prazo
 
@@ -216,22 +308,16 @@ Frontend (UI Update)
    - Logs de auditoria
    - Export para CSV/PDF
 
-2. **Arquitetura**:
-   - Implementação de CQRS
-   - Event Sourcing
-   - Microservices (se necessário)
-
-3. **DevOps**:
+2. **DevOps**:
    - Docker/Docker Compose
    - CI/CD pipeline
    - Monitoramento e logging
    - Deploy automatizado
 
-4. **Performance**:
+3. **Performance**:
    - Cache (Redis)
    - Rate limiting
    - Compressão de resposta
-   - CDN para assets
 
 ## 📝 Notas Adicionais
 
@@ -244,7 +330,6 @@ Frontend (UI Update)
 
 ### Por que Next.js?
 
-- Server-side rendering (SSR) e otimizações de performance
 - App Router com React Server Components
 - Roteamento file-based intuitivo
 - Excelente DX (Developer Experience)
@@ -253,21 +338,23 @@ Frontend (UI Update)
 
 A estrutura segue o padrão recomendado pelo NestJS:
 
-- **Controllers**: Lidam com requisições HTTP
-- **Services**: Contêm a lógica de negócio
-- **DTOs**: Definem contratos e validação
-- **Entities**: Modelam os dados
+- **Controllers**: Lidam com requisições HTTP e documentação Swagger
+- **Services**: Contêm a lógica de negócio e manipulação de dados
+- **DTOs**: Definem contratos, validação e documentação API
+- **Entities**: Modelam os dados de domínio
+- **common/**: Recursos compartilhados
+  - **filters/**: Exception filters globais
+  - **interceptors/**: Response transformers
 
 ### Estrutura de Pastas Frontend
 
-A estrutura segue o App Router do Next.js 14:
+A estrutura segue o App Router do Next.js 16:
 
-- **app/**: Rotas e layouts
-- **components/**: Componentes reutilizáveis
-- **services/**: Camada de integração com API
-
-## 🤝 Contato
-
-Para dúvidas ou sugestões sobre a implementação, sinta-se à vontade para entrar em contato.
-
----
+- **app/**: Rotas e layouts (file-based routing)
+- **components/**: Componentes reutilizáveis e de feature
+  - **hooks/**: Custom hooks (useUsers, useProfiles, mutations)
+  - **providers/**: Context providers (QueryClient, Theme)
+  - **ui/**: Componentes base do Shadcn/ui
+- **schemas/**: Schemas Zod para validação de formulários
+- **services/**: Camada de integração com API (api.service.ts)
+- **types/**: Definições de tipos TypeScript compartilhados
